@@ -1,0 +1,30 @@
+﻿# Backend - .NET
+**/bin/
+**/obj/
+**/.vs/
+**/*.user
+**/*.suo
+
+# App Settings - IGNORE SEMUA KECUALI TEMPLATE
+**/appsettings.json
+**/appsettings.Development.json
+**/appsettings.Production.json
+!**/appsettings.template.json
+
+# Frontend
+**/node_modules/
+**/dist/
+**/build/
+
+# Database
+**/*.db
+**/*.bak
+
+# Common
+**/.env
+**/logs/
+**/*.log
+
+# OS
+.DS_Store
+Thumbs.db

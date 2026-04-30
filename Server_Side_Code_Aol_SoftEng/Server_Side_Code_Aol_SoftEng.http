@@ -1,0 +1,6 @@
+@Server_Side_Code_Aol_SoftEng_HostAddress = http://localhost:5106
+
+GET {{Server_Side_Code_Aol_SoftEng_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
