@@ -10,8 +10,10 @@ namespace Server_Side_Code_Aol_SoftEng.Controllers
     public class LoginController : ControllerBase
     {
         private readonly IUserLoginService _userLoginService;
-        public LoginController(IUserLoginService userLoginService)
+        private readonly IJwtService _jwtService;
+        public LoginController(IUserLoginService userLoginService, IJwtService jwtService)
         {
+            _jwtService = jwtService;
             _userLoginService = userLoginService;
         }
         [HttpPost]
@@ -42,7 +44,16 @@ namespace Server_Side_Code_Aol_SoftEng.Controllers
 
             if (BCrypt.Net.BCrypt.Verify(requestBody.Password, userData.HashedPassword))
             {
-                // Generate JWT Token dan kirim balik
+                var jwtToken = _jwtService.GenerateSecurityToken(requestBody.Username, userData.Role);
+
+                return Ok(new UserLoginResponseModel
+                {
+                    Token = jwtToken,
+                    Message = "Login berhasil.",
+                    Role = userData.Role,
+                    Username = requestBody.Username,
+                    ExpireTime = DateTime.Now.AddHours(8) // Sekarang 8 jam asumsikan jam kerja 8 jam
+                });
             }
             else
             {

@@ -50,6 +50,7 @@ builder.Services.AddAuthentication(options =>
 });
 
 builder.Services.AddSingleton<IUserLoginService, UserLoginService>();
+builder.Services.AddSingleton<IJwtService, JwtService>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
