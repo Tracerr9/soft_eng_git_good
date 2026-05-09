@@ -30,9 +30,9 @@ namespace Server_Side_Code_Aol_SoftEng.Controllers
                 });
             }
 
-            string HashedPassword = await _userLoginService.GetUserHashedPasswordAsync(requestBody.Username);
+            var userData = await _userLoginService.GetUserLoginDataAsync(requestBody.Username);
 
-            if (string.IsNullOrEmpty(HashedPassword))
+            if (userData is null)
             {
                 return Unauthorized(new UserLoginResponseModel
                 {
@@ -40,7 +40,7 @@ namespace Server_Side_Code_Aol_SoftEng.Controllers
                 });
             }
 
-            if (BCrypt.Net.BCrypt.Verify(requestBody.Password, HashedPassword))
+            if (BCrypt.Net.BCrypt.Verify(requestBody.Password, userData.HashedPassword))
             {
                 // Generate JWT Token dan kirim balik
             }

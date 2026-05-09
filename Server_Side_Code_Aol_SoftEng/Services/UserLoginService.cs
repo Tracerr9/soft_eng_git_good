@@ -1,6 +1,7 @@
 ﻿using Microsoft.Data.SqlClient;
 using System.Data;
 using Server_Side_Code_Aol_SoftEng.Services.Interfaces;
+using Server_Side_Code_Aol_SoftEng.Models;
 
 namespace Server_Side_Code_Aol_SoftEng.Services
 {
@@ -13,9 +14,9 @@ namespace Server_Side_Code_Aol_SoftEng.Services
             _sqlConn = sqlConn;
             _logger = logger;
         }
-        public async Task<string> GetUserHashedPasswordAsync(string username)
+        public async Task<UserLoginData?> GetUserLoginDataAsync(string username)
         {
-            const string procedure = "User_GetPassword";
+            const string procedure = "User_GetLoginData";
             try
             {
                 await _sqlConn.OpenAsync();
@@ -25,13 +26,24 @@ namespace Server_Side_Code_Aol_SoftEng.Services
                 };
                 command.Parameters.Add(new SqlParameter("@Username", SqlDbType.VarChar, 255) { Value = username });
 
-                string hashedPassword = Convert.ToString(await command.ExecuteScalarAsync());
+                UserLoginData? userLoginData = null;
+
+                using var reader = await command.ExecuteReaderAsync();
+
+                if (await reader.ReadAsync())
+                {
+                    userLoginData = new UserLoginData
+                    {
+                        HashedPassword = reader.GetString(reader.GetOrdinal("Password")),
+                        Role = reader.GetString(reader.GetOrdinal("Role"))
+                    };
+                }
                 
-                return hashedPassword;
+                return userLoginData;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Terjadi kesalahan saat mengambil password untuk username: {u}", username);
+                _logger.LogError(ex, "Terjadi kesalahan saat mengambil data login untuk username: {u}", username);
                 throw;
             }
             finally
