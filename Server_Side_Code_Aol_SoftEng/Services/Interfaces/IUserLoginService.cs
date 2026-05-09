@@ -2,6 +2,6 @@
 {
     public interface IUserLoginService
     {
-        Task<string> GetUserHashedPassword(string username);
+        Task<string> GetUserHashedPasswordAsync(string username);
     }
 }

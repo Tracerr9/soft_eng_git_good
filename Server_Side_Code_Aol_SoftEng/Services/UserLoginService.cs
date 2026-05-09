@@ -13,13 +13,16 @@ namespace Server_Side_Code_Aol_SoftEng.Services
             _sqlConn = sqlConn;
             _logger = logger;
         }
-        public async Task<string> GetUserHashedPassword(string username)
+        public async Task<string> GetUserHashedPasswordAsync(string username)
         {
             const string procedure = "User_GetPassword";
             try
             {
                 await _sqlConn.OpenAsync();
-                using var command = new SqlCommand(procedure, _sqlConn);
+                using var command = new SqlCommand(procedure, _sqlConn)
+                {
+                    CommandType = CommandType.StoredProcedure
+                };
                 command.Parameters.Add(new SqlParameter("@Username", SqlDbType.VarChar, 255) { Value = username });
 
                 string hashedPassword = Convert.ToString(await command.ExecuteScalarAsync());
