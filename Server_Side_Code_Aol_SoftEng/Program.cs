@@ -3,13 +3,13 @@ using Microsoft.Data.SqlClient;
 using Microsoft.IdentityModel.Tokens;
 using Serilog;
 using Serilog.Events;
+using Server_Side_Code_Aol_SoftEng.Middlewares;
 using Server_Side_Code_Aol_SoftEng.Services;
 using Server_Side_Code_Aol_SoftEng.Services.Interfaces;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 Log.Logger = new LoggerConfiguration()
     .Enrich.FromLogContext()
     .MinimumLevel.Information()
@@ -17,7 +17,7 @@ Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Override("System", LogEventLevel.Warning)
     .WriteTo.File(
         path: @"C:\Aol_SoftEng_Logs\log-.txt",
-        outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss} [{Level}] [{UserName}] {Message}{NewLine}{Exception}",
+        outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss} [{Level}] [{Username}] {Message}{NewLine}{Exception}",
         rollingInterval: RollingInterval.Day
     )
     .CreateLogger();
@@ -67,6 +67,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseMiddleware<LoggingMiddleware>();
 
 app.UseAuthentication();
 app.UseAuthorization();
