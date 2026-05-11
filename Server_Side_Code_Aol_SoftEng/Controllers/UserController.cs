@@ -65,7 +65,14 @@ namespace Server_Side_Code_Aol_SoftEng.Controllers
 
             return Ok(new { message = "User berhasil diupdate." });
         }
-        
+        [HttpGet]
+        public async Task<IActionResult> OnGet()
+        {
+            List<UserDto> users = await _userService.GetAllUsersAsync();
+
+            if (users.Count == 0) return NoContent();
+            return Ok(users);
+        }
         //[HttpGet("auth-test")]
         //public IActionResult AuthTest() => Ok("Test Authorization");
     }
