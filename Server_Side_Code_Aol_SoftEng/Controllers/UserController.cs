@@ -17,7 +17,7 @@ namespace Server_Side_Code_Aol_SoftEng.Controllers
             _userService = userService;
         }
         [HttpPost]
-        public async Task<IActionResult> OnPost([FromBody] UserCreateModel requestBody)
+        public async Task<IActionResult> OnPostCreateUser([FromBody] UserCreateModel requestBody)
         {
             if (!ModelState.IsValid)
             {
@@ -38,6 +38,34 @@ namespace Server_Side_Code_Aol_SoftEng.Controllers
 
             return Ok(new { message = "User baru berhasil dibuat." });
         }
+        [HttpPut("{userId:int}")]
+        public async Task<IActionResult> OnPutUpdateUser([FromRoute] int userId, [FromBody] UserEditModel requestBody)
+        {
+            if (!ModelState.IsValid)
+            {
+                var firstError = ModelState
+                    .Where(x => x.Value.Errors.Count > 0)
+                    .Select(x => x.Value.Errors.First().ErrorMessage)
+                    .FirstOrDefault();
+
+                return BadRequest(new
+                {
+                    Message = firstError ?? "Validasi gagal."
+                });
+            }
+
+            string? newHashedPassword = null;
+
+            if (!string.IsNullOrEmpty(requestBody.Password))
+            {
+                newHashedPassword = BCrypt.Net.BCrypt.HashPassword(requestBody.Password, BCrypt.Net.BCrypt.GenerateSalt(12));
+            }
+
+            await _userService.UpdateUserAsync(requestBody, newHashedPassword, userId);
+
+            return Ok(new { message = "User berhasil diupdate." });
+        }
+        
         //[HttpGet("auth-test")]
         //public IActionResult AuthTest() => Ok("Test Authorization");
     }

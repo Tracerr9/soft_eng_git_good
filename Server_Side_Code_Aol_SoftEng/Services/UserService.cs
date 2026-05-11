@@ -45,5 +45,38 @@ namespace Server_Side_Code_Aol_SoftEng.Services
                 await _sqlConn.CloseAsync();
             }
         }
+        public async Task UpdateUserAsync(UserEditModel data, string? hashedPassword, int userId)
+        {
+            const string procedure = "User_UpdateUser";
+            try
+            {
+                await _sqlConn.OpenAsync();
+                using var command = new SqlCommand(procedure, _sqlConn)
+                {
+                    CommandType = CommandType.StoredProcedure
+                };
+
+                command.Parameters.Add(new SqlParameter("@UserId", SqlDbType.Int) { Value = userId });
+                command.Parameters.Add(new SqlParameter("@Username", SqlDbType.VarChar, 255) { Value = data.Username });
+                command.Parameters.Add(new SqlParameter("@Password", SqlDbType.NVarChar, 255) { Value = hashedPassword is null ? 
+                    DBNull.Value : hashedPassword });
+                command.Parameters.Add(new SqlParameter("@Role", SqlDbType.VarChar, 50) { Value = data.Role });
+
+                await command.ExecuteNonQueryAsync();
+
+                _logger.LogInformation("Update user dengan id: {i} menjadi username: {u} dan role: {r}",
+                    userId, data.Username, data.Role);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Terjadi kesalahan saat update user dengan id: {i} menjadi username: {u} dan role: {r}",
+                    userId, data.Username, data.Role);
+                throw;
+            }
+            finally
+            {
+                await _sqlConn.CloseAsync();
+            }
+        }
     }
 }
