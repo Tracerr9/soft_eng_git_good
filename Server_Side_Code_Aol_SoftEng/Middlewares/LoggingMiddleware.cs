@@ -15,7 +15,7 @@ namespace Server_Side_Code_Aol_SoftEng.Middlewares
         public async Task Invoke(HttpContext context)
         {
 
-            var username = context.User.Identity?.Name ?? context.Connection.RemoteIpAddress?.ToString() ?? "UnkowmIp/User";
+            var username = context.User.Identity?.Name ?? context.Connection.RemoteIpAddress?.ToString() ?? "UnknowmIp/User";
 
             using (LogContext.PushProperty("Username", username))
             {
