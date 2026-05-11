@@ -26,7 +26,7 @@ namespace Server_Side_Code_Aol_SoftEng.Controllers
                     .Select(x => x.Value.Errors.First().ErrorMessage)
                     .FirstOrDefault();
 
-                return BadRequest(new UserLoginResponseModel
+                return BadRequest(new
                 {
                     Message = firstError ?? "Validasi gagal."
                 });
@@ -38,7 +38,7 @@ namespace Server_Side_Code_Aol_SoftEng.Controllers
 
             return Ok(new { message = "User baru berhasil dibuat." });
         }
-        [HttpGet("auth-test")]
-        public IActionResult AuthTest() => Ok("Test Authorization");
+        //[HttpGet("auth-test")]
+        //public IActionResult AuthTest() => Ok("Test Authorization");
     }
 }
