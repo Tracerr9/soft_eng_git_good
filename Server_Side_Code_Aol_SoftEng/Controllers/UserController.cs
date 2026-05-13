@@ -71,6 +71,7 @@ namespace Server_Side_Code_Aol_SoftEng.Controllers
             List<UserDto> users = await _userService.GetAllUsersAsync();
 
             if (users.Count == 0) return NoContent();
+
             return Ok(users);
         }
         //[HttpGet("auth-test")]

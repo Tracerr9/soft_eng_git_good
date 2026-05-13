@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Server_Side_Code_Aol_SoftEng.Models;
 using Server_Side_Code_Aol_SoftEng.Services.Interfaces;
@@ -17,6 +18,7 @@ namespace Server_Side_Code_Aol_SoftEng.Controllers
             _userLoginService = userLoginService;
         }
         [HttpPost]
+        [AllowAnonymous]
         public async Task<IActionResult> OnPost([FromBody] UserLoginRequestModel requestBody)
         {
             if (!ModelState.IsValid)
