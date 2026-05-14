@@ -16,7 +16,7 @@ namespace Server_Side_Code_Aol_SoftEng.Controllers
         {
             _productService = productService;
         }
-        [HttpPost(Name = "Add New Product")]
+        [HttpPost]
         public async Task<IActionResult> OnPost([FromBody] ProductDto requestBody)
         {
             if (!ModelState.IsValid)
@@ -36,10 +36,10 @@ namespace Server_Side_Code_Aol_SoftEng.Controllers
 
             return Ok(new
             {
-                Message = "Produk baru berhasil ditambahkan"
+                Message = "Produk baru berhasil ditambahkan."
             });
         }
-        [HttpGet(Name = "Get all product")]
+        [HttpGet]
         public async Task<IActionResult> OnGet()
         {
             List<ProductDto> products = await _productService.GetAllProductsAsync();
@@ -47,6 +47,37 @@ namespace Server_Side_Code_Aol_SoftEng.Controllers
             if (products.Count == 0) return NoContent();
 
             return Ok(products);
+        }
+        [HttpPut("{sku}")]
+        public async Task<IActionResult> OnPut([FromRoute] string sku,  [FromBody] ProductDto requestBody)
+        {
+            if (!ModelState.IsValid)
+            {
+                var firstError = ModelState
+                    .Where(x => x.Value.Errors.Count > 0)
+                    .Select(x => x.Value.Errors.First().ErrorMessage)
+                    .FirstOrDefault();
+
+                return BadRequest(new
+                {
+                    Message = firstError ?? "Validasi gagal."
+                });
+            }
+
+            if (!sku.Equals(requestBody.SKU))
+            {
+                return BadRequest(new
+                {
+                    Message = "SKU Pada URL dan Body berbeda, pastikan sama."
+                });
+            }
+
+            await _productService.UpdateProductAsync(requestBody);
+
+            return Ok(new
+            {
+                Message = "Produk berhasil diupdate."
+            });
         }
     }
 }

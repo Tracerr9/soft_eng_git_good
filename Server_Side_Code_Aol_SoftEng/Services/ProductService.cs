@@ -40,7 +40,7 @@ namespace Server_Side_Code_Aol_SoftEng.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Terjadi kesalahan saat menambah produk baru denganSKU: {s}, Nama: {n}, dan stock: {st}",
+                _logger.LogError(ex, "Terjadi kesalahan saat menambah produk baru dengan SKU: {s}, Nama: {n}, dan stock: {st}",
                     product.SKU, product.ProductName, product.Stock);
                 throw;
             }
@@ -82,6 +82,40 @@ namespace Server_Side_Code_Aol_SoftEng.Services
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Terjadi kesalahan saat mengambil semua produk.");
+                throw;
+            }
+            finally
+            {
+                await _sqlConn.CloseAsync();
+            }
+        }
+        public async Task UpdateProductAsync(ProductDto product)
+        {
+            const string procedure = "Product_UpdateProduct";
+            try
+            {
+                await _sqlConn.OpenAsync();
+                using var command = new SqlCommand(procedure, _sqlConn)
+                {
+                    CommandType = CommandType.StoredProcedure
+                };
+
+                command.Parameters.Add(new SqlParameter("@SKU", SqlDbType.VarChar, 255) { Value = product.SKU });
+                command.Parameters.Add(new SqlParameter("@ProductName", SqlDbType.VarChar, 255) { Value = product.ProductName });
+                command.Parameters.Add(new SqlParameter("@Stock", SqlDbType.Int) { Value = product.Stock });
+                command.Parameters.Add(new SqlParameter("@StockThreshold", SqlDbType.Int) { Value = product.StockThreshold });
+                command.Parameters.Add(new SqlParameter("@Discount", SqlDbType.Decimal) { Value = product.Discount });
+                command.Parameters.Add(new SqlParameter("@BasePrice", SqlDbType.Decimal) { Value = product.BasePrice });
+
+                await command.ExecuteNonQueryAsync();
+
+                _logger.LogInformation("Update produk dengan SKU: {s}, Nama: {n}, dan stock: {st}",
+                    product.SKU, product.ProductName, product.Stock);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Terjadi kesalahan saat update produk dengan SKU: {s}, Nama: {n}, dan stock: {st}",
+                    product.SKU, product.ProductName, product.Stock);
                 throw;
             }
             finally
