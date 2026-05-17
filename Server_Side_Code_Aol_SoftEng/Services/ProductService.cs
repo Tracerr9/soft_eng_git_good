@@ -2,7 +2,6 @@
 using Server_Side_Code_Aol_SoftEng.Models;
 using Server_Side_Code_Aol_SoftEng.Services.Interfaces;
 using System.Data;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Server_Side_Code_Aol_SoftEng.Services
 {
