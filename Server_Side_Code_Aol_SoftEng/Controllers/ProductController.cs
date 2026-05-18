@@ -6,7 +6,7 @@ using Server_Side_Code_Aol_SoftEng.Services.Interfaces;
 
 namespace Server_Side_Code_Aol_SoftEng.Controllers
 {
-    //[Authorize(Roles = "Admin,Developer")]
+    [Authorize(Roles = "Admin,Developer")]
     [Route("api/[controller]")]
     [ApiController]
     public class ProductController : ControllerBase
