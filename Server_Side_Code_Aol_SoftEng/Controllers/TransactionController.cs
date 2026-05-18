@@ -6,7 +6,7 @@ using Server_Side_Code_Aol_SoftEng.Services.Interfaces;
 
 namespace Server_Side_Code_Aol_SoftEng.Controllers
 {
-    //[Authorize(Roles = "Admin,Developer,Cashier")]
+    [Authorize(Roles = "Admin,Developer,Cashier")]
     [Route("api/[controller]")]
     [ApiController]
     public class TransactionController : ControllerBase
@@ -17,7 +17,7 @@ namespace Server_Side_Code_Aol_SoftEng.Controllers
             _transactionService = transactionService;
         }
         [HttpPost]
-        public async Task<IActionResult> OnPost([FromBody] TransactionHeaderCreateDto requestBody)
+        public async Task<IActionResult> OnPost([FromBody] TransactionHeaderRequestDto requestBody)
         {
             if (!ModelState.IsValid)
             {
@@ -41,10 +41,30 @@ namespace Server_Side_Code_Aol_SoftEng.Controllers
                 Message = "Berhasil menyimpan transaksi."
             });
         }
+        [HttpPost("{transactionId:int}/void")]
+        public async Task<IActionResult> OnPostVoid(int transactionId)
+        {
+            await _transactionService.VoidTransactionAsync(transactionId);
+
+            return Ok(new
+            {
+                Message = "Berhasil membatalkan transaksi."
+            });
+        }
         [HttpGet]
         public async Task<IActionResult> OnGetAll()
         {
+            var transactions = await _transactionService.GetAllTransactionAsync();
 
+            if (transactions.Count == 0) return NoContent();
+            return Ok(transactions);
+        }
+        [HttpGet("{transactionId:int}")]
+        public async Task<IActionResult> OnGetDetail(int transactionId)
+        {
+            var transactionDetail = await _transactionService.GetTransactionDetailAsync(transactionId);
+
+            return Ok(transactionDetail);
         }
     }
 }

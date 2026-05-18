@@ -2,7 +2,6 @@
 {
     public class TransactionDetailDto
     {
-        public int TransactionId { get; set; }
         public string ProductSKU { get; set; }
         public int ProductAmount { get; set; }
     }
