@@ -2,9 +2,9 @@
 import { ref } from 'vue'
 
 const daftarKaryawan = ref([
-  { id: 'EMP-001', nama: 'Budi Santoso', role: 'Kasir', status: 'Aktif' },
-  { id: 'EMP-002', nama: 'Siti Aminah', role: 'Kasir', status: 'Aktif' },
-  { id: 'EMP-003', nama: 'Andi Wijaya', role: 'Admin', status: 'Cuti' }
+  { id: '1001', nama: 'Budi Santoso', role: 'Kasir', status: 'Aktif' },
+  { id: '1002', nama: 'Siti Aminah', role: 'Kasir', status: 'Aktif' },
+  { id: '1003', nama: 'Andi Wijaya', role: 'Admin', status: 'Cuti' }
 ])
 </script>
 
@@ -19,6 +19,9 @@ const daftarKaryawan = ref([
         <li class="nav-item">
           <RouterLink class="nav-link text-white" to="/admin-products">📦 Kelola Produk</RouterLink>
         </li>
+         <li class="nav-item">
+          <RouterLink class="nav-link text-white" to="/admin-transactions">🧾 Riwayat Transaksi</RouterLink>
+        </li>
         <li class="nav-item">
           <RouterLink class="nav-link text-white bg-primary rounded" to="/admin-employee">👥 Kelola Karyawan</RouterLink>
         </li>
@@ -31,7 +34,9 @@ const daftarKaryawan = ref([
     <div class="p-4 flex-grow-1 bg-light">
       <div class="d-flex justify-content-between align-items-center mb-4">
         <h2>Kelola Karyawan</h2>
-        <button class="btn btn-success fw-bold">+ Tambah Karyawan</button>
+        <RouterLink to="/admin-add-employee" class="btn btn-success fw-bold">
+          + Tambah Karyawan
+        </RouterLink>
       </div>
 
       <div class="card shadow-sm">
@@ -57,8 +62,10 @@ const daftarKaryawan = ref([
                   </span>
                 </td>
                 <td>
-                  <button class="btn btn-sm btn-outline-primary me-2">Edit</button>
-                  <button class="btn btn-sm btn-outline-danger">Hapus</button>
+                  <RouterLink :to="'/admin-edit-employee/' + emp.id" class="btn btn-sm btn-outline-primary me-2 fw-bold">
+                    Edit
+                  </RouterLink>
+                  <button class="btn btn-sm btn-outline-danger fw-bold">Hapus</button>
                 </td>
               </tr>
             </tbody>

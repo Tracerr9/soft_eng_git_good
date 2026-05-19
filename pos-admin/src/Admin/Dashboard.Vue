@@ -17,6 +17,9 @@ const transaksiHariIni = ref(85)
         <li class="nav-item">
           <RouterLink class="nav-link text-white" to="/admin-products">📦 Kelola Produk</RouterLink>
         </li>
+         <li class="nav-item">
+          <RouterLink class="nav-link text-white" to="/admin-transactions">🧾 Riwayat Transaksi</RouterLink>
+        </li>
         <li class="nav-item">
           <RouterLink class="nav-link text-white" to="/admin-employee">👥 Kelola Karyawan</RouterLink>
         </li>

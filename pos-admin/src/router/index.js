@@ -3,6 +3,12 @@ import AdminView from '../Admin/Dashboard.vue'
 import EmployeeView from '../Admin/Employee.vue'
 import ProductsView from '../Admin/Products.vue'
 import AuthView from '../Login/Login.vue'
+import AddProdView from '../Admin/AddProduct.vue'
+import AddTransactions from '../Admin/Transactions.vue'
+import AddTransactionDetail from '../Admin/TransactionDetails.vue'
+import AddEmployee from '../Admin/AddEmployee.vue'
+import AddEditEmployee from '../Admin/EditEmployee.vue'
+import EditProductView from '../Admin/EditProduct.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -23,9 +29,39 @@ const router = createRouter({
       component: ProductsView,
     },
     {
+      path: '/admin-edit-product/:sku', 
+      name: 'edit-product',
+      component: EditProductView,
+    },
+    {
       path: '/',
       name: 'login',
       component: AuthView,
+    },
+    {
+      path: '/admin-add-product',
+      name: 'add-products',
+      component: AddProdView,
+    },
+    {
+      path: '/admin-transactions',
+      name: 'transactions',
+      component: AddTransactions,
+    },
+    {
+      path: '/admin-transaction/:id', 
+      name: 'transactionDetail',
+      component: AddTransactionDetail,
+    },
+    {
+      path: '/admin-add-employee', 
+      name: 'add-employee',
+      component: AddEmployee,
+    },
+    {
+      path: '/admin-edit-employee/:id', 
+      name: 'edit-employee',
+      component: AddEditEmployee,
     },
   ],
 })
