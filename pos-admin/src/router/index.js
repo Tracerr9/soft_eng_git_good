@@ -9,6 +9,7 @@ import AddTransactionDetail from '../Admin/TransactionDetails.vue'
 import AddEmployee from '../Admin/AddEmployee.vue'
 import AddEditEmployee from '../Admin/EditEmployee.vue'
 import EditProductView from '../Admin/EditProduct.vue'
+import NotifView from '../Admin/Notification.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -62,6 +63,16 @@ const router = createRouter({
       path: '/admin-edit-employee/:id', 
       name: 'edit-employee',
       component: AddEditEmployee,
+    },
+    {
+      path: '/notification', 
+      name: 'notification',
+      component: AddEditEmployee,
+    },
+    {
+      path: '/admin-notifications', 
+      name: 'notifications',
+      component: NotifView,
     },
   ],
 })

@@ -28,6 +28,9 @@ const voidTransaksi = (id) => {
       <h4 class="mb-4 text-center">Smart POS</h4>
       <ul class="nav flex-column gap-2">
         <li class="nav-item">
+          <RouterLink class="nav-link text-white" to="/admin-notifications">🔔 Notifikasi System</RouterLink>
+        </li>
+        <li class="nav-item">
           <RouterLink class="nav-link text-white" to="/admin-dashboard">📊 Dashboard</RouterLink>
         </li>
         <li class="nav-item">
