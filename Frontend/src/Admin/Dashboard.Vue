@@ -1,36 +1,54 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
+import api from '../utils/axios'
+import Sidebar from '../components/Sidebar.vue'
 
-const jumlahProduk = ref(145)
-const jumlahKaryawan = ref(12)
-const transaksiHariIni = ref(85)
+const jumlahProduk = ref(0)
+const jumlahKaryawan = ref(0)
+const transaksiHariIni = ref(0)
+const produkStokMenipis = ref([])
+
+const loadDashboardData = async () => {
+  try {
+    // 1. Ambil data produk untuk hitung total
+    const resProduk = await api.get('/api/Product')
+    jumlahProduk.value = resProduk.data ? resProduk.data.length : 0
+    
+    // 2. Mengambil Peringatan Stok langsung dari Endpoint Khusus Notifikasi C#
+    const resNotif = await api.get('/api/Notification/Products')
+    // Jika server merespon 204 (No Content), artinya stok aman semua
+    produkStokMenipis.value = resNotif.data ? resNotif.data.map(item => ({
+      sku: item.sku || item.SKU,
+      productName: item.productName || item.ProductName,
+      stock: item.stock || item.Stock
+    })) : []
+
+    // 3. Ambil data transaksi untuk hitung transaksi hari ini
+    const resTransaksi = await api.get('/api/Transaction')
+    const hariIni = new Date().toISOString().split('T')[0]
+    if (resTransaksi.data) {
+      transaksiHariIni.value = resTransaksi.data.filter(t => 
+        (t.transactionDate || t.TransactionDate).startsWith(hariIni)
+      ).length
+    }
+
+    // 4. Ambil data karyawan
+    const resKaryawan = await api.get('/api/User') // Sesuai endpoint UserController Anda
+    jumlahKaryawan.value = resKaryawan.data ? resKaryawan.data.length : 0
+  } catch (error) {
+    console.error("Gagal memuat data dashboard:", error)
+  }
+}
+
+onMounted(() => {
+  loadDashboardData()
+})
 </script>
 
 <template>
+  
   <div class="d-flex" style="min-height: 100vh;">
-    <div class="bg-dark text-white p-3" style="width: 250px;">
-      <h4 class="mb-4 text-center">Smart POS</h4>
-      <ul class="nav flex-column gap-2">
-        <li class="nav-item">
-          <RouterLink class="nav-link text-white" to="/admin-notifications">Notifikasi System</RouterLink>
-        </li>
-        <li class="nav-item">
-          <RouterLink class="nav-link text-white bg-primary rounded" to="/admin-dashboard">Dashboard</RouterLink>
-        </li>
-        <li class="nav-item">
-          <RouterLink class="nav-link text-white" to="/product">Produk</RouterLink>
-        </li>
-         <li class="nav-item">
-          <RouterLink class="nav-link text-white" to="/admin-transactions">Riwayat Transaksi</RouterLink>
-        </li>
-        <li class="nav-item">
-          <RouterLink class="nav-link text-white" to="/admin-employee">Kelola Karyawan</RouterLink>
-        </li>
-        <li class="nav-item mt-5">
-          <RouterLink class="nav-link text-danger" to="/">Logout</RouterLink>
-        </li>
-      </ul>
-    </div>
+    <Sidebar />
 
     <div class="p-4 flex-grow-1 bg-light">
       <h2 class="mb-4">Dashboard Admin</h2>
@@ -77,23 +95,19 @@ const transaksiHariIni = ref(85)
               </tr>
             </thead>
             <tbody>
-              <tr>
-                <td>PRD-001</td>
-                <td class="fw-bold">Minyak Goreng 2L</td>
-                <td class="text-danger fw-bold">3</td>
-                <td><RouterLink class="btn btn-sm btn-primary" to="/product">Restock</RouterLink></td>
+              <tr v-for="produk in produkStokMenipis" :key="produk.sku">
+                <td>{{ produk.sku }}</td>
+                <td class="fw-bold">{{ produk.productName }}</td>
+                <td class="text-danger fw-bold">{{ produk.stock }}</td>
+                <td><RouterLink class="btn btn-sm btn-primary" to="/admin-notifications">Restock</RouterLink></td>
               </tr>
-              <tr>
-                <td>PRD-002</td>
-                <td class="fw-bold">Beras Setra Ramos 5kg</td>
-                <td class="text-danger fw-bold">1</td>
-                <td><RouterLink class="btn btn-sm btn-primary" to="/product">Restock</RouterLink></td>
+              <tr v-if="produkStokMenipis.length === 0">
+                <td colspan="4" class="text-center text-muted">Stok aman!</td>
               </tr>
             </tbody>
           </table>
         </div>
       </div>
-
     </div>
   </div>
 </template>

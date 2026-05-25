@@ -2,20 +2,20 @@
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import api from '../utils/axios'
+import Sidebar from '../components/Sidebar.vue'
 
 const route = useRoute()
 const router = useRouter()
 
-// Mengambil SKU dari URL
 const skuProduk = route.params.sku || route.params.id
 
-// Brand sudah dihapus dari daftar penampung
 const formProduk = ref({
   sku: '',
   productName: '',
   price: 0,
+  discount: 0, // Tambahan untuk diskon
   stock: 0,
-  category: ''
+  stockThreshold: 5
 })
 
 const isLoading = ref(true)
@@ -38,8 +38,9 @@ const ambilDetailProduk = async () => {
       sku: dataProdukPilihan.sku || dataProdukPilihan.SKU,
       productName: dataProdukPilihan.productName || dataProdukPilihan.ProductName || dataProdukPilihan.name,
       price: dataProdukPilihan.price || dataProdukPilihan.Price || dataProdukPilihan.basePrice || dataProdukPilihan.BasePrice || 0,
+      discount: dataProdukPilihan.discount || dataProdukPilihan.Discount || 0, // Ambil dari server
       stock: dataProdukPilihan.stock || dataProdukPilihan.Stock || 0,
-      category: dataProdukPilihan.category || dataProdukPilihan.Category || 'Minuman'
+      stockThreshold: dataProdukPilihan.stockThreshold || dataProdukPilihan.StockThreshold || 5
     }
 
   } catch (error) {
@@ -53,21 +54,15 @@ const ambilDetailProduk = async () => {
 
 const simpanPerubahan = async () => {
   try {
-    // Paket data dikirim tanpa brand, menggunakan format camelCase
     const payloadData = {
       sku: formProduk.value.sku,
       productName: formProduk.value.productName,
-      
-      // TRIK JITU: Kirim 'price' dan 'basePrice' sekaligus!
       price: formProduk.value.price,
       basePrice: formProduk.value.price, 
-      
-      stockThreshold: 10, 
-      stock: formProduk.value.stock,
-      category: formProduk.value.category
+      discount: formProduk.value.discount, // Kirim Diskon
+      stockThreshold: formProduk.value.stockThreshold, 
+      stock: formProduk.value.stock
     };
-
-    console.log("Mengirim data bersih:", payloadData);
 
     await api.put(`/api/Product/${skuProduk}`, payloadData);
 
@@ -92,29 +87,7 @@ onMounted(() => {
 
 <template>
   <div class="d-flex" style="min-height: 100vh;">
-    <div class="bg-dark text-white p-3" style="width: 250px;">
-      <h4 class="mb-4 text-center">Smart POS</h4>
-      <ul class="nav flex-column gap-2">
-        <li class="nav-item">
-          <RouterLink class="nav-link text-white" to="/admin-notifications">Notifikasi System</RouterLink>
-        </li>
-        <li class="nav-item">
-          <RouterLink class="nav-link text-white" to="/admin-dashboard">Dashboard</RouterLink>
-        </li>
-        <li class="nav-item">
-          <RouterLink class="nav-link text-white bg-primary rounded" to="/product">Produk</RouterLink>
-        </li>
-        <li class="nav-item">
-          <RouterLink class="nav-link text-white" to="/admin-transactions">Riwayat Transaksi</RouterLink>
-        </li>
-        <li class="nav-item">
-          <RouterLink class="nav-link text-white" to="/admin-employee">Kelola Karyawan</RouterLink>
-        </li>
-        <li class="nav-item mt-5">
-          <RouterLink class="nav-link text-danger" to="/">Logout</RouterLink>
-        </li>
-      </ul>
-    </div>
+    <Sidebar />
 
     <div class="p-4 flex-grow-1 bg-light">
       <div class="d-flex justify-content-between align-items-center mb-4">
@@ -122,9 +95,7 @@ onMounted(() => {
           <h2 class="fw-bold mb-0">Edit Produk</h2>
           <small class="text-muted">Mengubah data untuk SKU: <strong>{{ formProduk.sku }}</strong></small>
         </div>
-        <button class="btn btn-secondary shadow-sm" @click="router.push('/product')">
-          ⬅️ Kembali
-        </button>
+        <button class="btn btn-secondary shadow-sm" @click="router.push('/product')">⬅️ Kembali</button>
       </div>
 
       <div class="card shadow-sm" style="max-width: 700px;">
@@ -141,20 +112,30 @@ onMounted(() => {
               <input type="text" class="form-control" v-model="formProduk.productName" required>
             </div>
 
-            <div class="row mb-4">
-              <div class="col-md-4">
-                <label class="form-label fw-bold">Harga (Rp)</label> 
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label class="form-label fw-bold">Harga Awal (Rp)</label> 
                 <input type="number" class="form-control" v-model.number="formProduk.price" required>
               </div>
-              <div class="col-md-4">
-                <label class="form-label fw-bold">Stok Gudang</label>
-                <input type="number" class="form-control" v-model.number="formProduk.stock" required>
+              <div class="col-md-6">
+                <label class="form-label fw-bold text-success">Diskon Nominal (Rp)</label> 
+                <input type="number" class="form-control" v-model.number="formProduk.discount">
+                <small class="text-muted">Isi 0 jika tidak ada diskon.</small>
               </div>
             </div>
 
-            <button type="submit" class="btn btn-primary fw-bold w-100 py-2 shadow-sm">
-              Simpan Perubahan
-            </button>
+            <div class="row mb-4">
+              <div class="col-md-6">
+                <label class="form-label fw-bold">Stok Gudang</label>
+                <input type="number" class="form-control" v-model.number="formProduk.stock" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-bold text-danger">Stock Threshold (Batas Menipis)</label>
+                <input type="number" class="form-control" v-model.number="formProduk.stockThreshold" required>
+              </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary fw-bold w-100 py-2 shadow-sm">Simpan Perubahan</button>
           </form>
         </div>
       </div>

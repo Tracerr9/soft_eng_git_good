@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import api from '../utils/axios'
+import Sidebar from '../components/Sidebar.vue'
 
 // State untuk menyimpan data dari backend
 const riwayatTransaksi = ref([])
@@ -77,29 +78,7 @@ onMounted(() => {
 
 <template>
   <div class="d-flex" style="min-height: 100vh;">
-    <div class="bg-dark text-white p-3" style="width: 250px;">
-      <h4 class="mb-4 text-center">Smart POS</h4>
-      <ul class="nav flex-column gap-2">
-        <li class="nav-item">
-          <RouterLink class="nav-link text-white" to="/admin-notifications">Notifikasi System</RouterLink>
-        </li>
-        <li class="nav-item">
-          <RouterLink class="nav-link text-white" to="/admin-dashboard">Dashboard</RouterLink>
-        </li>
-        <li class="nav-item">
-          <RouterLink class="nav-link text-white" to="/product">Kasir / Produk</RouterLink>
-        </li>
-        <li class="nav-item">
-          <RouterLink class="nav-link text-white bg-primary rounded" to="/admin-transactions">Riwayat Transaksi</RouterLink>
-        </li>
-        <li class="nav-item">
-          <RouterLink class="nav-link text-white" to="/admin-employee">Kelola Karyawan</RouterLink>
-        </li>
-        <li class="nav-item mt-5">
-          <RouterLink class="nav-link text-danger" to="/">Logout</RouterLink>
-        </li>
-      </ul>
-    </div>
+    <Sidebar />
 
     <div class="p-4 flex-grow-1 bg-light">
       <div class="d-flex justify-content-between align-items-center mb-4">

@@ -2,16 +2,18 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import api from '../utils/axios' // Memanggil kurir Axios
+import Sidebar from '../components/Sidebar.vue'
 
 const router = useRouter()
 
-// Variabel disesuaikan dengan struktur tabel di database C#
+// Variabel disesuaikan persis dengan struktur tabel di database C# (ProductDto)
 const formProduk = ref({
   sku: '',
   productName: '',
   price: 0,
+  discount: 0, // Tambahan untuk diskon
   stock: 0,
-  category: 'Minuman'
+  stockThreshold: 5 // Default batas menipis
 })
 
 const isLoading = ref(false)
@@ -20,15 +22,14 @@ const simpanData = async () => {
   try {
     isLoading.value = true
     
-    // Paket data yang sudah disesuaikan dengan permintaan server (camelCase)
+    // Paket data yang sudah disesuaikan dengan permintaan server
     const payloadData = {
       sku: formProduk.value.sku,
       productName: formProduk.value.productName,
-      price: formProduk.value.price,
-      basePrice: formProduk.value.price, // Trik ganda agar terbaca C#
-      stockThreshold: 10, 
-      stock: formProduk.value.stock,
-      category: formProduk.value.category
+      basePrice: formProduk.value.price, 
+      discount: formProduk.value.discount, // Mengirim Diskon
+      stockThreshold: formProduk.value.stockThreshold, // Mengirim Threshold
+      stock: formProduk.value.stock
     }
 
     console.log("Mengirim data produk baru:", payloadData)
@@ -42,8 +43,8 @@ const simpanData = async () => {
   } catch (error) {
     console.error("Gagal menambah produk:", error)
     
-    // Menangkap pesan error dari backend jika SKU sudah ada/kembar
-    const pesanError = error.response?.data?.title || error.response?.data?.message || 'Pastikan SKU belum terpakai.'
+    // Menangkap pesan error dari backend jika validasi gagal atau SKU kembar
+    const pesanError = error.response?.data?.title || error.response?.data?.message || 'Pastikan form terisi dengan benar dan SKU belum terpakai.'
     alert(`Gagal menambah produk!\nDetail: ${pesanError}`)
   } finally {
     isLoading.value = false
@@ -53,29 +54,7 @@ const simpanData = async () => {
 
 <template>
   <div class="d-flex" style="min-height: 100vh;">
-    <div class="bg-dark text-white p-3" style="width: 250px;">
-      <h4 class="mb-4 text-center">Smart POS</h4>
-      <ul class="nav flex-column gap-2">
-        <li class="nav-item">
-          <RouterLink class="nav-link text-white" to="/admin-notifications">Notifikasi System</RouterLink>
-        </li>
-        <li class="nav-item">
-          <RouterLink class="nav-link text-white" to="/admin-dashboard">Dashboard</RouterLink>
-        </li>
-        <li class="nav-item">
-          <RouterLink class="nav-link text-white bg-primary rounded" to="/product">Produk</RouterLink>
-        </li>
-        <li class="nav-item">
-          <RouterLink class="nav-link text-white" to="/admin-transactions">Riwayat Transaksi</RouterLink>
-        </li>
-        <li class="nav-item">
-          <RouterLink class="nav-link text-white" to="/admin-employee">Kelola Karyawan</RouterLink>
-        </li>
-        <li class="nav-item mt-5">
-          <RouterLink class="nav-link text-danger" to="/">Logout</RouterLink>
-        </li>
-      </ul>
-    </div>
+    <Sidebar />
 
     <div class="p-4 flex-grow-1 bg-light">
       <div class="d-flex justify-content-between align-items-center mb-4">
@@ -99,21 +78,35 @@ const simpanData = async () => {
               </div>
             </div>
 
-            <h5 class="mb-3 mt-4 border-bottom pb-2">Stok & Harga</h5>
-            <div class="row mb-4">
-              <div class="col-md-4">
+            <h5 class="mb-3 mt-4 border-bottom pb-2">Harga & Diskon</h5>
+            <div class="row mb-3">
+              <div class="col-md-6">
                 <label class="form-label fw-bold">Harga Satuan (Rp)</label>
                 <input type="number" class="form-control" v-model.number="formProduk.price" required>
               </div>
-              <div class="col-md-4">
-                <label class="form-label fw-bold">Stok Awal Gudang</label>
-                <input type="number" class="form-control" v-model.number="formProduk.stock" required>
+              <div class="col-md-6">
+                <label class="form-label fw-bold text-success">Diskon Nominal (Rp)</label>
+                <input type="number" class="form-control" v-model.number="formProduk.discount">
+                <small class="text-muted">Isi 0 jika tidak ada diskon awal.</small>
               </div>
             </div>
 
-            <button type="submit" class="btn btn-success fw-bold w-100 py-2" :disabled="isLoading">
+            <h5 class="mb-3 mt-4 border-bottom pb-2">Manajemen Stok</h5>
+            <div class="row mb-4">
+              <div class="col-md-6">
+                <label class="form-label fw-bold">Stok Awal Gudang</label>
+                <input type="number" class="form-control" v-model.number="formProduk.stock" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-bold text-danger">Stock Threshold (Batas Menipis)</label>
+                <input type="number" class="form-control" v-model.number="formProduk.stockThreshold" required>
+                <small class="text-muted">Sistem akan memberi peringatan jika stok mencapai angka ini.</small>
+              </div>
+            </div>
+
+            <button type="submit" class="btn btn-success fw-bold w-100 py-2 shadow-sm" :disabled="isLoading">
               <span v-if="isLoading" class="spinner-border spinner-border-sm me-2"></span>
-              {{ isLoading ? 'Menyimpan ke Server...' : 'Simpan Produk Baru' }}
+              {{ isLoading ? 'Menyimpan ke Server...' : '💾 Simpan Produk Baru' }}
             </button>
           </form>
         </div>

@@ -1,81 +1,86 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
+import api from '../utils/axios'
+import Sidebar from '../components/Sidebar.vue'
 
-const daftarKaryawan = ref([
-  { id: '1001', nama: 'Budi Santoso', role: 'Kasir', status: 'Aktif' },
-  { id: '1002', nama: 'Siti Aminah', role: 'Kasir', status: 'Aktif' },
-  { id: '1003', nama: 'Andi Wijaya', role: 'Admin', status: 'Cuti' }
-])
+const daftarKaryawan = ref([])
+const isLoading = ref(true)
+
+const ambilDataKaryawan = async () => {
+  try {
+    isLoading.value = true
+    const response = await api.get('/api/User')
+    
+    // Mapping data agar sesuai dan aman
+    daftarKaryawan.value = response.data ? response.data.map(emp => ({
+      id: emp.id || emp.Id,
+      nama: emp.username || emp.Username,
+      role: emp.role || emp.Role
+    })) : []
+
+  } catch (error) {
+    console.error("Gagal memuat karyawan:", error)
+    alert("Gagal memuat data karyawan dari server.")
+  } finally {
+    isLoading.value = false
+  }
+}
+
+onMounted(() => {
+  ambilDataKaryawan()
+})
+
+const hapusKaryawan = () => {
+  alert("Maaf, API/Endpoint untuk menghapus karyawan belum dibuat di server C# Anda.")
+}
 </script>
 
 <template>
   <div class="d-flex" style="min-height: 100vh;">
-    <div class="bg-dark text-white p-3" style="width: 250px;">
-      <h4 class="mb-4 text-center">Smart POS</h4>
-      <ul class="nav flex-column gap-2">
-        <li class="nav-item">
-          <RouterLink class="nav-link text-white" to="/admin-notifications">Notifikasi System</RouterLink>
-        </li>
-        <li class="nav-item">
-          <RouterLink class="nav-link text-white" to="/admin-dashboard">Dashboard</RouterLink>
-        </li>
-        <li class="nav-item">
-          <RouterLink class="nav-link text-white" to="/product">Produk</RouterLink>
-        </li>
-         <li class="nav-item">
-          <RouterLink class="nav-link text-white" to="/admin-transactions">Riwayat Transaksi</RouterLink>
-        </li>
-        <li class="nav-item">
-          <RouterLink class="nav-link text-white bg-primary rounded" to="/admin-employee">Kelola Karyawan</RouterLink>
-        </li>
-        <li class="nav-item mt-5">
-          <RouterLink class="nav-link text-danger" to="/">Logout</RouterLink>
-        </li>
-      </ul>
-    </div>
+
+    <Sidebar />
 
     <div class="p-4 flex-grow-1 bg-light">
       <div class="d-flex justify-content-between align-items-center mb-4">
         <h2>Kelola Karyawan</h2>
-        <RouterLink to="/admin-add-employee" class="btn btn-success fw-bold">
-          + Tambah Karyawan
-        </RouterLink>
+        <RouterLink to="/admin-add-employee" class="btn btn-success fw-bold">+ Tambah Karyawan</RouterLink>
       </div>
 
-      <div class="card shadow-sm">
-        <div class="card-body">
-          <table class="table table-hover align-middle">
+      <div class="card shadow-sm border-0">
+        <div class="card-body p-0">
+          
+          <div v-if="isLoading" class="text-center py-5">
+            <div class="spinner-border text-primary"></div>
+          </div>
+
+          <table v-else class="table table-hover align-middle mb-0">
             <thead class="table-dark">
               <tr>
-                <th>ID</th>
-                <th>Nama Karyawan</th>
-                <th>Posisi</th>
-                <th>Status</th>
+                <th class="ps-3">ID</th>
+                <th>Username</th>
+                <th>Posisi (Role)</th>
                 <th>Aksi</th>
               </tr>
             </thead>
             <tbody>
               <tr v-for="emp in daftarKaryawan" :key="emp.id">
-                <td class="fw-bold">{{ emp.id }}</td>
-                <td>{{ emp.nama }}</td>
-                <td><span class="badge bg-secondary">{{ emp.role }}</span></td>
+                <td class="fw-bold ps-3">{{ emp.id }}</td>
+                <td class="fw-bold text-primary">{{ emp.nama }}</td>
                 <td>
-                  <span :class="{'text-success fw-bold': emp.status === 'Aktif', 'text-warning fw-bold': emp.status === 'Cuti'}">
-                    {{ emp.status }}
+                  <span class="badge" :class="emp.role === 'Cashier' ? 'bg-success' : 'bg-danger'">
+                    {{ emp.role }}
                   </span>
                 </td>
                 <td>
                   <RouterLink :to="'/admin-edit-employee/' + emp.id" class="btn btn-sm btn-outline-primary me-2 fw-bold">
                     Edit
                   </RouterLink>
-                  <button class="btn btn-sm btn-outline-danger fw-bold">Hapus</button>
                 </td>
               </tr>
             </tbody>
           </table>
         </div>
       </div>
-      
     </div>
   </div>
 </template>
