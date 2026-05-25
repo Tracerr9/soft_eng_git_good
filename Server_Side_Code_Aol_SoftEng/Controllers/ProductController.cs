@@ -6,7 +6,7 @@ using Server_Side_Code_Aol_SoftEng.Services.Interfaces;
 
 namespace Server_Side_Code_Aol_SoftEng.Controllers
 {
-    [Authorize(Roles = "Admin,Developer")]
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class ProductController : ControllerBase
@@ -17,6 +17,7 @@ namespace Server_Side_Code_Aol_SoftEng.Controllers
             _productService = productService;
         }
         [HttpPost]
+        [Authorize(Roles = "Admin,Developer")]
         public async Task<IActionResult> OnPost([FromBody] ProductDto requestBody)
         {
             if (!ModelState.IsValid)
@@ -40,6 +41,7 @@ namespace Server_Side_Code_Aol_SoftEng.Controllers
             });
         }
         [HttpGet]
+        [Authorize(Roles = "Admin,Developer,Cashier")]
         public async Task<IActionResult> OnGet()
         {
             List<ProductDto> products = await _productService.GetAllProductsAsync();
@@ -49,6 +51,7 @@ namespace Server_Side_Code_Aol_SoftEng.Controllers
             return Ok(products);
         }
         [HttpPut("{sku}")]
+        [Authorize(Roles = "Admin,Developer")]
         public async Task<IActionResult> OnPut([FromRoute] string sku,  [FromBody] ProductDto requestBody)
         {
             if (!ModelState.IsValid)
