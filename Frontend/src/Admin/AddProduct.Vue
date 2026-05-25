@@ -57,22 +57,22 @@ const simpanData = async () => {
       <h4 class="mb-4 text-center">Smart POS</h4>
       <ul class="nav flex-column gap-2">
         <li class="nav-item">
-          <RouterLink class="nav-link text-white" to="/admin-notifications">🔔 Notifikasi System</RouterLink>
+          <RouterLink class="nav-link text-white" to="/admin-notifications">Notifikasi System</RouterLink>
         </li>
         <li class="nav-item">
-          <RouterLink class="nav-link text-white" to="/admin-dashboard">📊 Dashboard</RouterLink>
+          <RouterLink class="nav-link text-white" to="/admin-dashboard">Dashboard</RouterLink>
         </li>
         <li class="nav-item">
-          <RouterLink class="nav-link text-white bg-primary rounded" to="/product">📦 Kasir / Produk</RouterLink>
+          <RouterLink class="nav-link text-white bg-primary rounded" to="/product">Produk</RouterLink>
         </li>
         <li class="nav-item">
-          <RouterLink class="nav-link text-white" to="/admin-transactions">🧾 Riwayat Transaksi</RouterLink>
+          <RouterLink class="nav-link text-white" to="/admin-transactions">Riwayat Transaksi</RouterLink>
         </li>
         <li class="nav-item">
-          <RouterLink class="nav-link text-white" to="/admin-employee">👥 Kelola Karyawan</RouterLink>
+          <RouterLink class="nav-link text-white" to="/admin-employee">Kelola Karyawan</RouterLink>
         </li>
         <li class="nav-item mt-5">
-          <RouterLink class="nav-link text-danger" to="/">🚪 Logout</RouterLink>
+          <RouterLink class="nav-link text-danger" to="/">Logout</RouterLink>
         </li>
       </ul>
     </div>
@@ -113,7 +113,7 @@ const simpanData = async () => {
 
             <button type="submit" class="btn btn-success fw-bold w-100 py-2" :disabled="isLoading">
               <span v-if="isLoading" class="spinner-border spinner-border-sm me-2"></span>
-              {{ isLoading ? 'Menyimpan ke Server...' : '💾 Simpan Produk Baru' }}
+              {{ isLoading ? 'Menyimpan ke Server...' : 'Simpan Produk Baru' }}
             </button>
           </form>
         </div>

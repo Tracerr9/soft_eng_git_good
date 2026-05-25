@@ -81,22 +81,22 @@ onMounted(() => {
       <h4 class="mb-4 text-center">Smart POS</h4>
       <ul class="nav flex-column gap-2">
         <li class="nav-item">
-          <RouterLink class="nav-link text-white" to="/admin-notifications">🔔 Notifikasi System</RouterLink>
+          <RouterLink class="nav-link text-white" to="/admin-notifications">Notifikasi System</RouterLink>
         </li>
         <li class="nav-item">
-          <RouterLink class="nav-link text-white" to="/admin-dashboard">📊 Dashboard</RouterLink>
+          <RouterLink class="nav-link text-white" to="/admin-dashboard">Dashboard</RouterLink>
         </li>
         <li class="nav-item">
-          <RouterLink class="nav-link text-white" to="/product">📦 Kasir / Produk</RouterLink>
+          <RouterLink class="nav-link text-white" to="/product">Kasir / Produk</RouterLink>
         </li>
         <li class="nav-item">
-          <RouterLink class="nav-link text-white bg-primary rounded" to="/admin-transactions">🧾 Riwayat Transaksi</RouterLink>
+          <RouterLink class="nav-link text-white bg-primary rounded" to="/admin-transactions">Riwayat Transaksi</RouterLink>
         </li>
         <li class="nav-item">
-          <RouterLink class="nav-link text-white" to="/admin-employee">👥 Kelola Karyawan</RouterLink>
+          <RouterLink class="nav-link text-white" to="/admin-employee">Kelola Karyawan</RouterLink>
         </li>
         <li class="nav-item mt-5">
-          <RouterLink class="nav-link text-danger" to="/">🚪 Logout</RouterLink>
+          <RouterLink class="nav-link text-danger" to="/">Logout</RouterLink>
         </li>
       </ul>
     </div>
@@ -118,7 +118,7 @@ onMounted(() => {
           </div>
 
           <div v-else-if="riwayatTransaksi.length === 0" class="text-center py-5 text-muted">
-            <h1 style="font-size: 3rem;">📄</h1>
+            <h1 style="font-size: 3rem;"></h1>
             <h5>Belum ada transaksi.</h5>
           </div>
 
