@@ -66,6 +66,7 @@ namespace Server_Side_Code_Aol_SoftEng.Controllers
             return Ok(new { message = "User berhasil diupdate." });
         }
         [HttpGet]
+        [Authorize(Roles = "Admin,Developer,Cashier")]
         public async Task<IActionResult> OnGet()
         {
             List<UserDto> users = await _userService.GetAllUsersAsync();

@@ -63,6 +63,16 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddProblemDetails();
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowLocalhost", policy =>
+    {
+        policy.WithOrigins("http://localhost:5173", "https://localhost:5173", "http://127.0.0.1:5173")
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials(); 
+    });
+});
 
 // Gantikan builder.Services.AddSwaggerGen(); dengan blok ini:
 builder.Services.AddSwaggerGen(options =>
@@ -111,11 +121,13 @@ if (app.Environment.IsDevelopment())
 }
 
 
+
 app.UseExceptionHandler();
 app.UseStatusCodePages();
 
 app.UseHttpsRedirection();
 
+app.UseCors("AllowLocalhost");
 
 app.UseAuthentication();
 app.UseAuthorization();
