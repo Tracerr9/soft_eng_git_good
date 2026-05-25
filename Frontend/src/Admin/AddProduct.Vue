@@ -1,24 +1,53 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import api from '../utils/axios' // Memanggil kurir Axios
 
 const router = useRouter()
 
-// Variabel penampung data yang diketik di form
+// Variabel disesuaikan dengan struktur tabel di database C#
 const formProduk = ref({
-  nama: '',
-  merk: '',
-  hargaSatuan: 0,
-  hargaBox: 0,
-  isiBox: 0
+  sku: '',
+  productName: '',
+  price: 0,
+  stock: 0,
+  category: 'Minuman'
 })
 
-const simpanData = () => {
-  // Simulasi menyimpan ke database
-  alert(`Sukses! Produk ${formProduk.value.nama} berhasil ditambahkan ke katalog.`)
-  
-  // Setelah sukses, otomatis pindah kembali ke halaman daftar produk
-  router.push('/product')
+const isLoading = ref(false)
+
+const simpanData = async () => {
+  try {
+    isLoading.value = true
+    
+    // Paket data yang sudah disesuaikan dengan permintaan server (camelCase)
+    const payloadData = {
+      sku: formProduk.value.sku,
+      productName: formProduk.value.productName,
+      price: formProduk.value.price,
+      basePrice: formProduk.value.price, // Trik ganda agar terbaca C#
+      stockThreshold: 10, 
+      stock: formProduk.value.stock,
+      category: formProduk.value.category
+    }
+
+    console.log("Mengirim data produk baru:", payloadData)
+
+    // Perintah POST untuk memasukkan data baru ke database
+    await api.post('/api/Product', payloadData)
+
+    alert(`Sukses! Produk ${formProduk.value.productName} berhasil ditambahkan ke katalog.`)
+    router.push('/product')
+
+  } catch (error) {
+    console.error("Gagal menambah produk:", error)
+    
+    // Menangkap pesan error dari backend jika SKU sudah ada/kembar
+    const pesanError = error.response?.data?.title || error.response?.data?.message || 'Pastikan SKU belum terpakai.'
+    alert(`Gagal menambah produk!\nDetail: ${pesanError}`)
+  } finally {
+    isLoading.value = false
+  }
 }
 </script>
 
@@ -34,7 +63,7 @@ const simpanData = () => {
           <RouterLink class="nav-link text-white" to="/admin-dashboard">📊 Dashboard</RouterLink>
         </li>
         <li class="nav-item">
-          <RouterLink class="nav-link text-white bg-primary rounded" to="/admin-product">📦 Kasir / Produk</RouterLink>
+          <RouterLink class="nav-link text-white bg-primary rounded" to="/product">📦 Kasir / Produk</RouterLink>
         </li>
         <li class="nav-item">
           <RouterLink class="nav-link text-white" to="/admin-transactions">🧾 Riwayat Transaksi</RouterLink>
@@ -61,32 +90,31 @@ const simpanData = () => {
             <h5 class="mb-3 border-bottom pb-2">Informasi Dasar</h5>
             <div class="row mb-3">
               <div class="col-md-6">
-                <label class="form-label">Nama Produk</label>
-                <input type="text" class="form-control" v-model="formProduk.nama" required placeholder="Contoh: Susu UHT">
+                <label class="form-label fw-bold">SKU (Kode Barang Unik)</label>
+                <input type="text" class="form-control" v-model="formProduk.sku" required placeholder="Contoh: PRD-001">
               </div>
               <div class="col-md-6">
-                <label class="form-label">Merk</label>
-                <input type="text" class="form-control" v-model="formProduk.merk" required placeholder="Contoh: Indomilk">
+                <label class="form-label fw-bold">Nama Produk</label>
+                <input type="text" class="form-control" v-model="formProduk.productName" required placeholder="Contoh: Susu UHT">
               </div>
             </div>
 
-            <h5 class="mb-3 mt-4 border-bottom pb-2">Informasi Harga & Box</h5>
+            <h5 class="mb-3 mt-4 border-bottom pb-2">Stok & Harga</h5>
             <div class="row mb-4">
               <div class="col-md-4">
-                <label class="form-label">Harga Satuan ($)</label>
-                <input type="number" step="0.01" class="form-control" v-model="formProduk.hargaSatuan" required>
+                <label class="form-label fw-bold">Harga Satuan (Rp)</label>
+                <input type="number" class="form-control" v-model.number="formProduk.price" required>
               </div>
               <div class="col-md-4">
-                <label class="form-label">Harga Per Box ($)</label>
-                <input type="number" step="0.01" class="form-control" v-model="formProduk.hargaBox" required>
-              </div>
-              <div class="col-md-4">
-                <label class="form-label">Isi Per Box (Pcs)</label>
-                <input type="number" class="form-control" v-model="formProduk.isiBox" required>
+                <label class="form-label fw-bold">Stok Awal Gudang</label>
+                <input type="number" class="form-control" v-model.number="formProduk.stock" required>
               </div>
             </div>
 
-            <button type="submit" class="btn btn-success fw-bold w-100 py-2">💾 Simpan Produk Baru</button>
+            <button type="submit" class="btn btn-success fw-bold w-100 py-2" :disabled="isLoading">
+              <span v-if="isLoading" class="spinner-border spinner-border-sm me-2"></span>
+              {{ isLoading ? 'Menyimpan ke Server...' : '💾 Simpan Produk Baru' }}
+            </button>
           </form>
         </div>
       </div>

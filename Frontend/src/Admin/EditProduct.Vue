@@ -150,15 +150,6 @@ onMounted(() => {
                 <label class="form-label fw-bold">Stok Gudang</label>
                 <input type="number" class="form-control" v-model.number="formProduk.stock" required>
               </div>
-              <div class="col-md-4">
-                <label class="form-label fw-bold">Kategori</label>
-                <select class="form-select" v-model="formProduk.category" required>
-                  <option value="Minuman">Minuman</option>
-                  <option value="Makanan">Makanan</option>
-                  <option value="Sembako">Sembako</option>
-                  <option value="Lainnya">Lainnya</option>
-                </select>
-              </div>
             </div>
 
             <button type="submit" class="btn btn-primary fw-bold w-100 py-2 shadow-sm">

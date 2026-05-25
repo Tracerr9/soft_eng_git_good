@@ -71,17 +71,33 @@ const totalBelanja = computed(() => {
   return keranjang.value.reduce((total, item) => total + (item.price * item.jumlah), 0)
 })
 
-const prosesCheckout = () => {
+const prosesCheckout = async () => {
   if (keranjang.value.length === 0) return
-  // Mengubah alert pemberitahuan menjadi Rupiah juga
-  alert(`Transaksi Berhasil!\nTotal Pembayaran: ${formatRupiah(totalBelanja.value)}`)
-  keranjang.value.forEach(itemKeranjang => {
-    const produkAsli = daftarProduk.value.find(p => p.sku === itemKeranjang.sku)
-    if (produkAsli) {
-      produkAsli.stock -= itemKeranjang.jumlah
+
+  try {
+    // Gunakan {...item} untuk membuat salinan data baru, 
+    // agar data asli di keranjang tidak terikat dengan data di tabel produk
+    const detailTransaksi = keranjang.value.map(item => ({
+      ProductSKU: item.sku,
+      ProductAmount: item.jumlah, // <--- Perubahan ke ProductAmount
+      Price: item.price
+    }))
+
+    const payloadTransaksi = {
+      Details: detailTransaksi,
+      TransactionDate: new Date().toISOString(),
+      Total: totalBelanja.value
     }
-  })
-  keranjang.value = []
+
+    await api.post('/api/Transaction', payloadTransaksi)
+    alert(`Transaksi Berhasil!`)
+    
+    keranjang.value = []
+    ambilDataProduk()
+  } catch (error) {
+    console.error("Gagal memproses transaksi:", error)
+    alert(`Transaksi Gagal!`)
+  }
 }
 </script>
 
@@ -105,7 +121,7 @@ const prosesCheckout = () => {
           <h2 class="fw-bold mb-0 text-dark">Mode Kasir</h2>
           <small class="text-muted">Pilih produk untuk ditambahkan ke transaksi (Draft)</small>
         </div>
-        <RouterLink to="/admin-add-product" class="btn btn-outline-primary fw-bold shadow-sm">+ Tambah Master Produk</RouterLink>
+        <RouterLink to="/admin-add-product" class="btn btn-outline-primary fw-bold shadow-sm">+ Tambah Produk</RouterLink>
       </div>
       
       <div class="row">
